@@ -13,7 +13,7 @@
     padding:20px;
     backdrop-filter:blur(2px)
   }
-.container{max-width:900px;margin:auto;background:rgba(255,255,255,0.97);border-radius:22px;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,0.25)}
+.container{max-width:950px;margin:auto;background:rgba(255,255,255,0.97);border-radius:22px;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,0.25)}
   h1{color:#15803d;text-align:center;margin-bottom:25px;font-size:28px}
 .card{background:#f0fdf4;border:2px solid #bbf7d0;border-radius:18px;padding:22px;margin-bottom:20px}
   h2{color:#166534;font-size:18px;margin-bottom:15px;border-right:5px solid #22c55e;padding-right:12px}
@@ -41,28 +41,41 @@
 .checkbox-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px}
 .checkbox-grid label{font-weight:500;font-size:13px;display:flex;align-items:center;gap:6px}
 .warning{color:#dc2626;font-size:12px;margin-top:5px}
-/* جديد BMI */
 .bmi-box{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border-radius:16px;padding:20px;margin-top:15px;text-align:center}
 .bmi-value{font-size:48px;font-weight:bold;margin:10px 0}
 .bmi-status{font-size:18px;margin-top:8px}
 .bmi-desc{font-size:14px;margin-top:5px;opacity:0.9}
+.body-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.stat-card{background:rgba(255,255,255,0.2);padding:10px;border-radius:10px;font-size:13px}
+.stat-card span{font-size:20px;font-weight:bold;display:block}
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>🥬🥬 ظبط يومك 🥬🥬</h1>
+  <h1>🥬 ظبط يومك 🥬</h1>
 
-  <!-- 1. بيانات المريض + الأمراض -->
+  <!-- 1. بيانات المريض + الأمراض + بيانات InBody -->
   <div class="card">
-    <h2>1. بياناتك الصحية الأول</h2>
+    <h2>1. بياناتك الصحية والجسم</h2>
     <div class="grid">
       <div><label>الاسم</label><input type="text" id="pName" placeholder="اسمك"></div>
-      <div><label>الوزن kg</label><input type="number" id="pWeight" placeholder="70" oninput="calcBMI()"></div>
-      <div><label>الطول cm</label><input type="number" id="pHeight" placeholder="170" oninput="calcBMI()"></div>
+      <div><label>الوزن kg</label><input type="number" id="pWeight" placeholder="58.1" step="0.1" oninput="calcBMI()"></div>
+      <div><label>الطول cm</label><input type="number" id="pHeight" placeholder="160" oninput="calcBMI()"></div>
       <div><label>العمر</label><input type="number" id="pAge" placeholder="30"></div>
       <div><label>هدف السعرات اليومي</label><input type="number" id="calGoal" value="1500"></div>
-      <div><label>هدف البروتين جم</label><input type="number" id="proGoal" value="120"></div>
+      <div><label>هدف البروتين جم</label><input type="number" id="proGoal" value="93"></div>
     </div>
+
+    <h3 style="color:#166534;margin-top:15px;font-size:16px">بيانات InBody - اختياري</h3>
+    <div class="grid">
+      <div><label>كتلة العضلات SMM كجم</label><input type="number" id="pMuscle" placeholder="21.8" step="0.1"></div>
+      <div><label>كتلة الدهون كجم</label><input type="number" id="pFat" placeholder="17.5" step="0.1"></div>
+      <div><label>نسبة الدهون PBF %</label><input type="number" id="pFatPercent" placeholder="30.9" step="0.1" oninput="calcBMI()"></div>
+      <div><label>مياه الجسم لتر</label><input type="number" id="pWater" placeholder="29.8" step="0.1"></div>
+      <div><label>البروتين كجم</label><input type="number" id="pProtein" placeholder="7.9" step="0.1"></div>
+      <div><label>المعادن كجم</label><input type="number" id="pMinerals" placeholder="2.86" step="0.01"></div>
+    </div>
+
     <label style="margin-top:12px">هل عندك أي أمراض/حساسيات؟</label>
     <div class="checkbox-grid">
       <label><input type="checkbox" id="d_sugar"> سكر</label>
@@ -73,15 +86,21 @@
     </div>
     <button class="btn" onclick="savePatient()">💾 حفظ البيانات الصحية</button>
 
-    <!-- جديد: نتيجة BMI -->
+    <!-- نتيجة BMI + تحليل الجسم -->
     <div id="bmiResult" class="bmi-box" style="display:none">
-      <h3>📊 تحليل جسمك</h3>
+      <h3>📊 تحليل جسمك الكامل</h3>
       <div class="bmi-value" id="bmiValue">0</div>
       <div class="bmi-status" id="bmiStatus">-</div>
       <div class="bmi-desc" id="bmiDesc">-</div>
-      <div style="margin-top:12px;font-size:14px">
-        <span id="bodyType"></span> | <span id="fatPercent"></span>
+
+      <div class="body-stats" id="bodyStats">
+        <div class="stat-card"><span id="statMuscle">-</span>عضلات</div>
+        <div class="stat-card"><span id="statFat">-</span>دهون</div>
+        <div class="stat-card"><span id="statFatP">-</span>نسبة دهون</div>
+        <div class="stat-card"><span id="statWater">-</span>مياه</div>
       </div>
+
+      <div style="margin-top:12px;font-size:14px" id="bodyType"></div>
     </div>
   </div>
 
@@ -126,9 +145,9 @@
     <label>نوع الوجبة</label>
     <select id="mealType">
       <option value="any">أي حاجة متوازنة</option>
-      <option value="high_pro">عالي بروتين</option>
-      <option value="low_carb">قليل كارب - مناسب للسكر</option>
-      <option value="low_sodium">قليل صوديوم - مناسب للضغط</option>
+      <option value="high_pro">عالي بروتين - بناء عضل</option>
+      <option value="low_carb">قليل كارب - حرق دهون</option>
+      <option value="low_sodium">قليل صوديوم - للضغط</option>
       <option value="snack">سناك خفيف</option>
     </select>
     <button class="btn btn-ai" onclick="suggestMeals()">✨ اقترحلي 3 وجبات دلوقتي</button>
@@ -183,6 +202,12 @@ function savePatient(){
     age:+pAge.value,
     calGoal:+calGoal.value,
     proGoal:+proGoal.value,
+    muscle:+pMuscle.value,
+    fatMass:+pFat.value,
+    fatPercent:+pFatPercent.value,
+    water:+pWater.value,
+    protein:+pProtein.value,
+    minerals:+pMinerals.value,
     diseases:{
       sugar:d_sugar.checked,
       pressure:d_pressure.checked,
@@ -193,12 +218,11 @@ function savePatient(){
   };
   localStorage.setItem('smartPatient', JSON.stringify(patient));
   calTarget.value = patient.calGoal;
-  alert('تم حفظ بياناتك الصحية ✅ الذكاء الاصطناعي هيراعي أمراضك دلوقتي');
+  alert('تم حفظ بياناتك الصحية ✅ الذكاء الاصطناعي هيراعي جسمك وأمراضك');
   calcBMI();
   renderLog();
 }
 
-// جديد: حساب BMI وطبيعة الجسم
 function calcBMI(){
   let w = parseFloat(pWeight.value);
   let h = parseFloat(pHeight.value);
@@ -208,11 +232,10 @@ function calcBMI(){
     return;
   }
 
-  let h_m = h / 100; // تحويل ل متر
+  let h_m = h / 100;
   let bmi = w / (h_m * h_m);
   bmi = bmi.toFixed(1);
 
-  // تحديد الحالة
   let status = '';
   let desc = '';
   let color = '#22c55e';
@@ -239,25 +262,31 @@ function calcBMI(){
     color = '#dc2626';
   }
 
-  // تقدير نسبة الدهون Deurenberg formula
-  let age = parseFloat(pAge.value) || 30;
-  let fatPercent = (1.20 * bmi) + (0.23 * age) - 16.2; // تقريبي للستات
-  fatPercent = fatPercent.toFixed(1);
+  // لو فيه نسبة دهون مدخلة
+  let fatP = parseFloat(pFatPercent.value);
+  if(fatP){
+    if(fatP > 30) desc = 'نسبة الدهون عالية شوية، ركزي بروتين عالي + كارب قليل لحرق الدهون';
+    else if(fatP < 25) desc = 'نسبة الدهون ممتازة، حافظي على العضل';
+  }
 
-  // تحديد طبيعة الجسم
+  // طبيعة الجسم
   let bodyType = '';
   if(bmi < 20) bodyType = 'إكتومورف - جسم نحيف سريع الحرق';
   else if(bmi < 27) bodyType = 'ميزومورف - جسم رياضي عضلي';
   else bodyType = 'إندومورف - جسم يخزن دهون بسهولة';
 
-  // عرض النتيجة
   document.getElementById('bmiResult').style.display = 'block';
   document.getElementById('bmiResult').style.background = `linear-gradient(135deg,${color},${color}dd)`;
   document.getElementById('bmiValue').textContent = bmi;
   document.getElementById('bmiStatus').textContent = status;
   document.getElementById('bmiDesc').textContent = desc;
   document.getElementById('bodyType').textContent = `طبيعة الجسم: ${bodyType}`;
-  document.getElementById('fatPercent').textContent = `نسبة الدهون التقريبية: ${fatPercent}%`;
+
+  // عرض إحصائيات الجسم
+  if(pMuscle.value) document.getElementById('statMuscle').textContent = pMuscle.value + 'كجم';
+  if(pFat.value) document.getElementById('statFat').textContent = pFat.value + 'كجم';
+  if(pFatPercent.value) document.getElementById('statFatP').textContent = pFatPercent.value + '%';
+  if(pWater.value) document.getElementById('statWater').textContent = pWater.value + 'لتر';
 }
 
 function searchFood(){
@@ -365,7 +394,7 @@ function resetForm(){
   imgData='';
 }
 
-// الذكاء الاصطناعي - يشتغل على أي رقم
+// الذكاء الاصطناعي - يراعي نسبة الدهون والعضل
 function suggestMeals(){
   let target = parseFloat(document.getElementById('calTarget').value);
   let type = document.getElementById('mealType').value;
@@ -374,6 +403,9 @@ function suggestMeals(){
     aiResults.innerHTML = '<div class="warning">اكتبي السعرات المتبقية الأول 💚</div>';
     return;
   }
+
+  // لو نسبة الدهون عالية خليه low_carb أوتوماتيك
+  if(patient.fatPercent > 30 && type == 'any') type = 'low_carb';
 
   let allowedFoods = Object.keys(db).filter(food => {
     let data = db[food];
@@ -391,8 +423,8 @@ function suggestMeals(){
 
   let baseTemplates = {
     high_pro: [
-      [{food:"صدور فراخ مشوية",g:100},{food:"بيضة مسلوقة",g:100},{food:"سلطة خضار",g:150}],
-      [{food:"تونة مصفاة",g:100},{food:"جبنة قريش",g:150}],
+      [{food:"صدور فراخ مشوية",g:120},{food:"بيضة مسلوقة",g:100},{food:"سلطة خضار",g:150}],
+      [{food:"تونة مصفاة",g:120},{food:"جبنة قريش",g:150}],
       [{food:"زبادي يوناني",g:200},{food:"لوز",g:15}]
     ],
     low_carb: [
@@ -418,7 +450,7 @@ function suggestMeals(){
   };
 
   let templates = baseTemplates[type] || baseTemplates.any;
-  let html = `<h3 style="color:#15803d;margin:15px 0">3 وجبات محسوبة بالذكاء الاصطناعي لـ ${target} سعر:</h3>`;
+  let html = `<h3 style="color:#15803d;margin:15px 0">3 وجبات محسوبة لجسمك لـ ${target} سعر:</h3>`;
 
   templates.forEach((template, idx) => {
     let filtered = template.filter(it => allowedFoods.includes(it.food));
@@ -491,7 +523,6 @@ function addMealToLog(name, items, scale){
   alert('تم إضافة الوجبة الكاملة لسجلك ✅');
 }
 
-// تحميل البيانات
 window.onload = () => {
   if(patient.name){
     pName.value = patient.name;
@@ -500,6 +531,12 @@ window.onload = () => {
     pAge.value = patient.age;
     calGoal.value = patient.calGoal;
     proGoal.value = patient.proGoal;
+    pMuscle.value = patient.muscle;
+    pFat.value = patient.fatMass;
+    pFatPercent.value = patient.fatPercent;
+    pWater.value = patient.water;
+    pProtein.value = patient.protein;
+    pMinerals.value = patient.minerals;
     if(patient.diseases){
       d_sugar.checked = patient.diseases.sugar;
       d_pressure.checked = patient.diseases.pressure;
