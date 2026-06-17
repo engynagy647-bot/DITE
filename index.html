@@ -24,6 +24,7 @@
 .btn{width:100%;background:#22c55e;color:#fff;border:none;padding:15px;border-radius:12px;font-weight:bold;font-size:16px;cursor:pointer;margin-top:10px;transition:0.2s}
 .btn:hover{background:#16a34a;transform:translateY(-2px)}
 .btn-ai{background:linear-gradient(135deg,#16a34a,#15803d)}
+.btn-workout{background:linear-gradient(135deg,#f59e0b,#d97706)}
 .suggestions{position:relative}
 .list{position:absolute;width:100%;background:#fff;border:2px solid #86efac;border-radius:10px;max-height:220px;overflow-y:auto;z-index:20;display:none;box-shadow:0 5px 20px rgba(0,0,0,0.1)}
 .item{padding:12px;cursor:pointer;border-bottom:1px solid #dcfce7;font-size:14px}
@@ -38,8 +39,6 @@
 .meal-items{font-size:14px;line-height:1.9;color:#14532d;margin-bottom:8px}
 .macros span{background:#bbf7d0;color:#166534;padding:6px 10px;border-radius:7px;font-size:13px;margin:3px;display:inline-block;font-weight:600}
 .delete-btn{background:#ef4444;padding:6px 12px;font-size:13px;border:none;color:#fff;border-radius:7px;cursor:pointer}
-.checkbox-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px}
-.checkbox-grid label{font-weight:500;font-size:13px;display:flex;align-items:center;gap:6px}
 .warning{color:#dc2626;font-size:12px;margin-top:5px}
 .bmi-box{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border-radius:16px;padding:20px;margin-top:15px;text-align:center}
 .bmi-value{font-size:48px;font-weight:bold;margin:10px 0}
@@ -48,60 +47,31 @@
 .body-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
 .stat-card{background:rgba(255,255,255,0.2);padding:10px;border-radius:10px;font-size:13px}
 .stat-card span{font-size:20px;font-weight:bold;display:block}
+.user-info{background:#dcfce7;border:2px solid #bbf7d0;border-radius:12px;padding:15px;margin-bottom:15px;text-align:center;color:#166534;font-weight:700;font-size:16px}
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>🥬 ظبط يومك 🥬</h1>
+  <h1>🥬 التراكر الذكي + الذكاء الاصطناعي</h1>
 
-  <!-- 1. بيانات المريض + الأمراض + بيانات InBody -->
-  <div class="card">
-    <h2>1. بياناتك الصحية والجسم</h2>
-    <div class="grid">
-      <div><label>الاسم</label><input type="text" id="pName" placeholder="اسمك"></div>
-      <div><label>الوزن kg</label><input type="number" id="pWeight" placeholder="58.1" step="0.1" oninput="calcBMI()"></div>
-      <div><label>الطول cm</label><input type="number" id="pHeight" placeholder="160" oninput="calcBMI()"></div>
-      <div><label>العمر</label><input type="number" id="pAge" placeholder="30"></div>
-      <div><label>هدف السعرات اليومي</label><input type="number" id="calGoal" value="1500"></div>
-      <div><label>هدف البروتين جم</label><input type="number" id="proGoal" value="93"></div>
+  <!-- معلومات المستخدم من localStorage -->
+  <div id="userInfoBox"></div>
+
+  <!-- نتيجة BMI + تحليل الجسم -->
+  <div id="bmiResult" class="bmi-box" style="display:none">
+    <h3>📊 تحليل جسمك الكامل</h3>
+    <div class="bmi-value" id="bmiValue">0</div>
+    <div class="bmi-status" id="bmiStatus">-</div>
+    <div class="bmi-desc" id="bmiDesc">-</div>
+
+    <div class="body-stats" id="bodyStats">
+      <div class="stat-card"><span id="statMuscle">-</span>عضلات</div>
+      <div class="stat-card"><span id="statFat">-</span>دهون</div>
+      <div class="stat-card"><span id="statFatP">-</span>نسبة دهون</div>
+      <div class="stat-card"><span id="statWater">-</span>مياه</div>
     </div>
 
-    <h3 style="color:#166534;margin-top:15px;font-size:16px">بيانات InBody - اختياري</h3>
-    <div class="grid">
-      <div><label>كتلة العضلات SMM كجم</label><input type="number" id="pMuscle" placeholder="21.8" step="0.1"></div>
-      <div><label>كتلة الدهون كجم</label><input type="number" id="pFat" placeholder="17.5" step="0.1"></div>
-      <div><label>نسبة الدهون PBF %</label><input type="number" id="pFatPercent" placeholder="30.9" step="0.1" oninput="calcBMI()"></div>
-      <div><label>مياه الجسم لتر</label><input type="number" id="pWater" placeholder="29.8" step="0.1"></div>
-      <div><label>البروتين كجم</label><input type="number" id="pProtein" placeholder="7.9" step="0.1"></div>
-      <div><label>المعادن كجم</label><input type="number" id="pMinerals" placeholder="2.86" step="0.01"></div>
-    </div>
-
-    <label style="margin-top:12px">هل عندك أي أمراض/حساسيات؟</label>
-    <div class="checkbox-grid">
-      <label><input type="checkbox" id="d_sugar"> سكر</label>
-      <label><input type="checkbox" id="d_pressure"> ضغط</label>
-      <label><input type="checkbox" id="d_gluten"> حساسية جلوتين</label>
-      <label><input type="checkbox" id="d_lactose"> حساسية ألبان</label>
-      <label><input type="checkbox" id="d_kidney"> مشاكل كلى</label>
-    </div>
-    <button class="btn" onclick="savePatient()">💾 حفظ البيانات الصحية</button>
-
-    <!-- نتيجة BMI + تحليل الجسم -->
-    <div id="bmiResult" class="bmi-box" style="display:none">
-      <h3>📊 تحليل جسمك الكامل</h3>
-      <div class="bmi-value" id="bmiValue">0</div>
-      <div class="bmi-status" id="bmiStatus">-</div>
-      <div class="bmi-desc" id="bmiDesc">-</div>
-
-      <div class="body-stats" id="bodyStats">
-        <div class="stat-card"><span id="statMuscle">-</span>عضلات</div>
-        <div class="stat-card"><span id="statFat">-</span>دهون</div>
-        <div class="stat-card"><span id="statFatP">-</span>نسبة دهون</div>
-        <div class="stat-card"><span id="statWater">-</span>مياه</div>
-      </div>
-
-      <div style="margin-top:12px;font-size:14px" id="bodyType"></div>
-    </div>
+    <div style="margin-top:12px;font-size:14px" id="bodyType"></div>
   </div>
 
   <!-- 2. إضافة وجبة -->
@@ -153,10 +123,13 @@
     <button class="btn btn-ai" onclick="suggestMeals()">✨ اقترحلي 3 وجبات دلوقتي</button>
     <div id="aiResults"></div>
   </div>
+
+  <!-- زرار التمارين الجديد -->
+  <button class="btn btn-workout" onclick="window.location.href='workout.html'">💪 روحي لصفحة التمارين الكاملة</button>
 </div>
 
 <script>
-// قاعدة بيانات 60 أكلة صحية لكل 100جم + علامات الأمراض
+// قاعدة بيانات 60 أكلة صحية لكل 100جم
 const db = {
 "صدور فراخ مشوية":{c:165,p:31,f:3.6,cb:0,gluten:0,dairy:0,sodium:70},
 "ورك فراخ بدون جلد":{c:209,p:26,f:11,cb:0,gluten:0,dairy:0,sodium:80},
@@ -194,43 +167,26 @@ let dayLog = JSON.parse(localStorage.getItem('smartLog')) || [];
 let patient = JSON.parse(localStorage.getItem('smartPatient')) || {};
 let imgData = '';
 
-function savePatient(){
-  patient = {
-    name:pName.value,
-    weight:+pWeight.value,
-    height:+pHeight.value,
-    age:+pAge.value,
-    calGoal:+calGoal.value,
-    proGoal:+proGoal.value,
-    muscle:+pMuscle.value,
-    fatMass:+pFat.value,
-    fatPercent:+pFatPercent.value,
-    water:+pWater.value,
-    protein:+pProtein.value,
-    minerals:+pMinerals.value,
-    diseases:{
-      sugar:d_sugar.checked,
-      pressure:d_pressure.checked,
-      gluten:d_gluten.checked,
-      lactose:d_lactose.checked,
-      kidney:d_kidney.checked
-    }
-  };
-  localStorage.setItem('smartPatient', JSON.stringify(patient));
-  calTarget.value = patient.calGoal;
-  alert('تم حفظ بياناتك الصحية ✅ الذكاء الاصطناعي هيراعي جسمك وأمراضك');
-  calcBMI();
-  renderLog();
+function showUserInfo(){
+  if(patient.name){
+    document.getElementById('userInfoBox').innerHTML = `
+      <div class="user-info">
+        مرحباً ${patient.name} 👋 | هدفك اليومي: ${patient.calGoal || 1500} سعر | بروتين: ${patient.proGoal || 93}جم
+      </div>
+    `;
+    document.getElementById('calTarget').value = patient.calGoal || 1500;
+  } else {
+    document.getElementById('userInfoBox').innerHTML = `
+      <div class="warning" style="text-align:center;padding:15px">مفيش بيانات! ارجعي لصفحة البيانات الأول</div>
+    `;
+  }
 }
 
 function calcBMI(){
-  let w = parseFloat(pWeight.value);
-  let h = parseFloat(pHeight.value);
+  let w = patient.weight;
+  let h = patient.height;
 
-  if(!w ||!h || h <= 0) {
-    document.getElementById('bmiResult').style.display = 'none';
-    return;
-  }
+  if(!w ||!h || h <= 0) return;
 
   let h_m = h / 100;
   let bmi = w / (h_m * h_m);
@@ -262,14 +218,12 @@ function calcBMI(){
     color = '#dc2626';
   }
 
-  // لو فيه نسبة دهون مدخلة
-  let fatP = parseFloat(pFatPercent.value);
+  let fatP = patient.fatPercent;
   if(fatP){
     if(fatP > 30) desc = 'نسبة الدهون عالية شوية، ركزي بروتين عالي + كارب قليل لحرق الدهون';
     else if(fatP < 25) desc = 'نسبة الدهون ممتازة، حافظي على العضل';
   }
 
-  // طبيعة الجسم
   let bodyType = '';
   if(bmi < 20) bodyType = 'إكتومورف - جسم نحيف سريع الحرق';
   else if(bmi < 27) bodyType = 'ميزومورف - جسم رياضي عضلي';
@@ -282,11 +236,10 @@ function calcBMI(){
   document.getElementById('bmiDesc').textContent = desc;
   document.getElementById('bodyType').textContent = `طبيعة الجسم: ${bodyType}`;
 
-  // عرض إحصائيات الجسم
-  if(pMuscle.value) document.getElementById('statMuscle').textContent = pMuscle.value + 'كجم';
-  if(pFat.value) document.getElementById('statFat').textContent = pFat.value + 'كجم';
-  if(pFatPercent.value) document.getElementById('statFatP').textContent = pFatPercent.value + '%';
-  if(pWater.value) document.getElementById('statWater').textContent = pWater.value + 'لتر';
+  if(patient.muscle) document.getElementById('statMuscle').textContent = patient.muscle + 'كجم';
+  if(patient.fatMass) document.getElementById('statFat').textContent = patient.fatMass + 'كجم';
+  if(patient.fatPercent) document.getElementById('statFatP').textContent = patient.fatPercent + '%';
+  if(patient.water) document.getElementById('statWater').textContent = patient.water + 'لتر';
 }
 
 function searchFood(){
@@ -394,7 +347,7 @@ function resetForm(){
   imgData='';
 }
 
-// الذكاء الاصطناعي - يراعي نسبة الدهون والعضل
+// الذكاء الاصطناعي
 function suggestMeals(){
   let target = parseFloat(document.getElementById('calTarget').value);
   let type = document.getElementById('mealType').value;
@@ -404,11 +357,10 @@ function suggestMeals(){
     return;
   }
 
-  // لو نسبة الدهون عالية خليه low_carb أوتوماتيك
   if(patient.fatPercent > 30 && type == 'any') type = 'low_carb';
 
   let allowedFoods = Object.keys(db).filter(food => {
-    let data = db[food];
+    let data = db;
     if(patient.diseases?.gluten && data.gluten) return false;
     if(patient.diseases?.lactose && data.dairy) return false;
     if(patient.diseases?.pressure && data.sodium > 300) return false;
@@ -524,27 +476,7 @@ function addMealToLog(name, items, scale){
 }
 
 window.onload = () => {
-  if(patient.name){
-    pName.value = patient.name;
-    pWeight.value = patient.weight;
-    pHeight.value = patient.height;
-    pAge.value = patient.age;
-    calGoal.value = patient.calGoal;
-    proGoal.value = patient.proGoal;
-    pMuscle.value = patient.muscle;
-    pFat.value = patient.fatMass;
-    pFatPercent.value = patient.fatPercent;
-    pWater.value = patient.water;
-    pProtein.value = patient.protein;
-    pMinerals.value = patient.minerals;
-    if(patient.diseases){
-      d_sugar.checked = patient.diseases.sugar;
-      d_pressure.checked = patient.diseases.pressure;
-      d_gluten.checked = patient.diseases.gluten;
-      d_lactose.checked = patient.diseases.lactose;
-      d_kidney.checked = patient.diseases.kidney;
-    }
-  }
+  showUserInfo();
   calcBMI();
   renderLog();
 };
